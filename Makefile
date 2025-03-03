@@ -3,6 +3,7 @@ CLUSTER_NAME ?=otel
 
 cluster:
 	kind create cluster --name=$(CLUSTER_NAME) --config ./kind/multi-node.yaml
+	kubectl create namespace opentelemetry
 
 docker:
 	docker build -f ./services/todo-go/Dockerfile -t todo-go:$(VERSION) ./services/todo-go
@@ -22,8 +23,9 @@ deploy-otel-operator-prereqs:
 	helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set crds.enabled=true
 	helm upgrade --install opentelemetry-operator open-telemetry/opentelemetry-operator --set manager.extraArgs="{--enable-go-instrumentation}" --set "manager.collectorImage.repository=otel/opentelemetry-collector-k8s" --namespace opentelemetry --create-namespace
 	kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.80.1/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+	kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.80.1/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
 
-deploy-otel-collector: deploy-otel-operator-prereqs 
+deploy-otel-collector: 
 	kubectl apply -f ./otel-collector/rbac-daemonset.yaml
 	kubectl apply -f ./otel-collector/rbac-central.yaml
 	kubectl apply -f ./otel-collector/rbac-target-allocator.yaml
@@ -41,12 +43,25 @@ deploy-perses-operator:
 deploy-perses-dashboards:
 	kubectl apply -f ./perses/prometheus-datasource.yaml
 	kubectl apply -f ./perses/go-dashboard.yaml
+	kubectl apply -f ./perses/jvm-dashboard.yaml
 
 deploy-postgres:
 	helm install pg oci://registry-1.docker.io/bitnamicharts/postgresql \
   		--set global.postgresql.auth.postgresPassword=password \
   		--set global.postgresql.auth.database=todo
 
+deploy-mysql:
+	helm install my-mysql bitnami/mysql \
+		--set auth.rootPassword=mysecretPassword \
+		--set auth.database=todo \
+		--set auth.username=todo \
+		--set auth.password=mysecretPassword
+
 instrumentation:
 	kubectl apply -f ./instrumentations/instrumentation.yaml
 
+delete-cluster:
+	kind delete cluster --name=$(CLUSTER_NAME)
+
+
+install-all-preqs: deploy-otel-operator-prereqs deploy-prometheus-jaeger deploy-perses-operator deploy-postgres deploy-mysql
