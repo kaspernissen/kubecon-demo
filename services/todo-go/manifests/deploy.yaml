@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: todo-go
+  name: todo-go
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-go
+  template:
+    metadata:
+      labels:
+        app: todo-go
+      annotations:
+        instrumentation.opentelemetry.io/inject-go: "opentelemetry/instrumentation"
+        instrumentation.opentelemetry.io/otel-go-auto-target-exe: '/todo'
+    spec:
+      containers:
+      - image: todo-go:v1
+        name: todo-go
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+          - name: DB_PASSWORD
+            value: "password"
+          - name: DB_HOST
+            value: "pg-postgresql"
+

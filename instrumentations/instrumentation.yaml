@@ -1,0 +1,28 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: instrumentation
+  namespace: opentelemetry
+spec:
+  exporter:
+    endpoint: http://otel-collector.opentelemetry.svc.cluster.local:4317
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: always_on
+  resource:
+    addK8sUIDAttributes: true
+  go:
+    image: docker.io/otel/autoinstrumentation-go@sha256:7df5d9e9040c935b11ff3bbed59b4b67139cd349b97abc188e003576fc05a4c0
+    env:
+    - name: OTEL_EXPORTER_OTLP_PROTOCOL
+      value: "grpc"
+    - name: OTEL_LOG_LEVEL
+      value: debug
+    - name:  OTEL_GO_AUTO_GLOBAL
+      value: 'true'
+    - name: OTEL_GO_AUTO_INCLUDE_DB_STATEMENT
+      value: 'true'
+    - name: OTEL_GO_AUTO_PARSE_DB_STATEMENT
+      value: 'true'

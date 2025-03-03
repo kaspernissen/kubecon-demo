@@ -1,0 +1,28 @@
+apiVersion: perses.dev/v1alpha1
+kind: Perses
+metadata:
+  labels:
+    app.kubernetes.io/name: perses
+    app.kubernetes.io/instance: perses-sample
+    app.kubernetes.io/part-of: perses-operator
+    app.kubernetes.io/created-by: perses-operator
+  name: perses
+  namespace: default
+spec:
+  metadata:
+    labels:
+      instance: perses
+  config:
+    database:
+      file:
+        folder: "/etc/perses/storage"
+        extension: "yaml"
+    schemas:
+      panels_path: "/etc/perses/cue/schemas/panels"
+      queries_path: "/etc/perses/cue/schemas/queries"
+      datasources_path: "/etc/perses/cue/schemas/datasources"
+      variables_path: "/etc/perses/cue/schemas/variables"
+    ephemeral_dashboard:
+      enable: false
+      cleanup_interval: "1s"
+  containerPort: 8080

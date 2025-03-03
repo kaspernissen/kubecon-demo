@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: todo-java
+  name: todo-java
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-java
+  template:
+    metadata:
+      labels:
+        app: todo-java
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "opentelemetry/instrumentation"
+    spec:
+      containers:
+      - image: todo-java:v1
+        name: todo-java
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+          - name: SPRING_DATASOURCE_URL
+            value: "jdbc:mysql://my-mysql.default.svc.cluster.local.:3306/todo"
+          - name: SPRING_DATASOURCE_USERNAME
+            value: "todo"
+          - name: SPRING_DATASOURCE_PASSWORD
+            value: "mysecretPassword"
+

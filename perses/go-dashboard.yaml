@@ -1,0 +1,261 @@
+apiVersion: perses.dev/v1alpha1
+kind: PersesDashboard
+metadata:
+  name: go
+  namespace: default
+spec:
+  display:
+    name: Go
+  panels:
+    Processmemory:
+      kind: Panel
+      spec:
+        display:
+          name: Process memory
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: table
+              position: bottom
+              size: medium
+            visual:
+              areaOpacity: 0
+              connectNulls: false
+              display: line
+              lineWidth: 1.25
+              pointRadius: 2.75
+            yAxis:
+              format:
+                decimalPlaces: 0
+                unit: bytes
+              label: ''
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'process_resident_memory_bytes{pod=~"todo-go.*"}'
+                  seriesNameFormat: '{{ pod }} - resident'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'process_virtual_memory_bytes{pod=~"todo-go.*"}'
+                  seriesNameFormat: '{{ pod }} - virtual'
+    Processmemory-1:
+      kind: Panel
+      spec:
+        display:
+          name: Process memory deriv
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: table
+              position: bottom
+              size: medium
+            visual:
+              areaOpacity: 0
+              connectNulls: false
+              display: line
+              lineWidth: 1.25
+              pointRadius: 2.75
+            yAxis:
+              format:
+                decimalPlaces: 0
+                unit: bytes
+              label: ''
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'rate(process_resident_memory_bytes{pod=~"todo-go.*"}[5m])'
+                  seriesNameFormat: '{{ pod }} - resident'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'deriv(process_virtual_memory_bytes{pod=~"todo-go.*"}[5m])'
+                  seriesNameFormat: '{{ pod }} - virtual'
+    gomemstats:
+      kind: Panel
+      spec:
+        display:
+          name: go memstats
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+              mode: table
+              values:
+                - last
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'go_memstats_alloc_bytes{pod=~"todo-go.*"}'
+                  seriesNameFormat: '{{pod}} - bytes allocated'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'rate(go_memstats_alloc_bytes_total{pod=~"todo-go-.*"}[30s])'
+                  seriesNameFormat: '{{pod}} - alloc rate'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'go_memstats_stack_inuse_bytes{pod=~"todo-go-.*"}'
+                  seriesNameFormat: '{{pod}} - stack inuse'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'go_memstats_heap_inuse_bytes{pod=~"todo-go-.*"}'
+                  seriesNameFormat: '{{pod}} - heap inuse'
+    gomemstats-1:
+      kind: Panel
+      spec:
+        display:
+          name: go memstats deriv
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+              mode: table
+              values:
+                - last
+            yAxis:
+              show: true
+              label: ''
+              format:
+                unit: decimal
+                shortValues: true
+              min: -10000
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'deriv(go_memstats_alloc_bytes{pod=~"todo-go.*"}[5m])'
+                  seriesNameFormat: '{{pod}} - bytes allocated'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'rate(go_memstats_alloc_bytes_total{pod=~"todo-go.*"}[5m])'
+                  seriesNameFormat: '{{pod}} - alloc rate'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'deriv(go_memstats_stack_inuse_bytes{pod=~"todo-go.*"}[5m])'
+                  seriesNameFormat: '{{pod}} - stack inuse'
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'deriv(go_memstats_heap_inuse_bytes{pod=~"todo-go-.*"}[5m])'
+                  seriesNameFormat: '{{pod}} - heap inuse'
+    openfds:
+      kind: Panel
+      spec:
+        display:
+          name: open fds
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'process_open_fds{pod=~"todo-go-.*"}'
+                  seriesNameFormat: '{{ pod }}'
+    openfds-1:
+      kind: Panel
+      spec:
+        display:
+          name: open fds deriv
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: 'deriv(process_open_fds{pod=~"todo-go-.*"}[5m])'
+                  seriesNameFormat: '{{ pod }}'
+  layouts:
+    - kind: Grid
+      spec:
+        display:
+          title: Panel Group
+          collapse:
+            open: true
+        items:
+          - x: 0
+            'y': 0
+            width: 12
+            height: 8
+            content:
+              $ref: '#/spec/panels/Processmemory'
+          - x: 12
+            'y': 0
+            width: 12
+            height: 8
+            content:
+              $ref: '#/spec/panels/Processmemory-1'
+          - x: 0
+            'y': 8
+            width: 12
+            height: 8
+            content:
+              $ref: '#/spec/panels/gomemstats'
+          - x: 12
+            'y': 8
+            width: 12
+            height: 8
+            content:
+              $ref: '#/spec/panels/gomemstats-1'
+          - x: 0
+            'y': 16
+            width: 12
+            height: 6
+            content:
+              $ref: '#/spec/panels/openfds'
+          - x: 12
+            'y': 16
+            width: 12
+            height: 6
+            content:
+              $ref: '#/spec/panels/openfds-1'
+  variables: []
+  duration: 1h
+  refreshInterval: 0s

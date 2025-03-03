@@ -1,0 +1,441 @@
+apiVersion: perses.dev/v1alpha1
+kind: PersesDashboard
+metadata:
+  name: jvm-metrics
+  namespace: default
+spec:
+  display:
+    name: JVM Metrics
+    description: Visualizes the semantic conventions for JVM metrics collected
+  panels:
+    1414a5e9-2288-4d91-832b-6a856a2dd8f6:
+      kind: Panel
+      spec:
+        display:
+          name: CPU Load
+          description: ''
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: false
+              display: line
+              lineWidth: 2
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: seconds
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: >-
+                    sum by
+                    (instance)(increase(process_runtime_jvm_system_cpu_load_1m[5m]))
+                  seriesNameFormat: '{{ instance }}'
+    1782a76b-9d98-4b19-866e-f4b0354e3220:
+      kind: Panel
+      spec:
+        display:
+          name: Threads
+        plugin:
+          kind: Markdown
+          spec:
+            text: >+
+              Java Virtual Machine (JVM) metrics captured under the namespace
+              `jvm.thread.*`
+
+              Status: **Stable**
+
+    2feec1a5-ca5b-4a11-829d-b1668c637516:
+      kind: Panel
+      spec:
+        display:
+          name: Thread Count
+          description: "Number of executing platform threads.\t"
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: true
+              display: line
+              lineWidth: 2
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: decimal
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: >-
+                    sum by
+                    (instance)(increase(process_runtime_jvm_threads_count[5m]))
+                  seriesNameFormat: '{{ service_name }} (state: {{jvm_thread_state}})'
+    4a651aae-bb3c-41ff-8b38-f2dfa3828810:
+      kind: Panel
+      spec:
+        display:
+          name: Garbage Collection Duration (p95)
+          description: Duration of JVM garbage collection actions.
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: true
+              display: line
+              lineWidth: 2
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: decimal
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: >-
+                    histogram_quantile(0.95, sum by(le,instance)
+                    (rate(process_runtime_jvm_gc_duration_seconds_bucket[5m])))
+                  seriesNameFormat: '{{ instance }}:'
+    6f0b5266-a4c4-4cac-af05-b16c5d6fe37d:
+      kind: Panel
+      spec:
+        display:
+          name: Memory Limit
+          description: "Measure of max obtainable memory.\t"
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: true
+              display: line
+              lineWidth: 2
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: bytes
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: sum by (instance)(process_runtime_jvm_memory_limit_bytes)
+                  seriesNameFormat: '{{ service_name }} ({{ jvm_memory_type }})'
+    74374d23-3674-45ba-bb8f-29e883021d23:
+      kind: Panel
+      spec:
+        display:
+          name: Memory Used
+          description: Measure of memory used.
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: true
+              display: line
+              lineWidth: 2
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: bytes
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: >-
+                    sum by
+                    (instance)(increase(process_runtime_jvm_memory_usage_bytes[5m]))
+                  seriesNameFormat: '{{ instance  }}'
+    902835ad-86b7-4aaf-b895-771e4cbc9fda:
+      kind: Panel
+      spec:
+        display:
+          name: CPU
+        plugin:
+          kind: Markdown
+          spec:
+            text: >+
+              Java Virtual Machine (JVM) metrics captured under the namespace
+              `jvm.cpu.*`.
+
+              Status: **Stable**
+
+    91f5fb54-d399-42ef-82af-56b4ed8de130:
+      kind: Panel
+      spec:
+        display:
+          name: Memory
+        plugin:
+          kind: Markdown
+          spec:
+            text: >-
+              Java Virtual Machine (JVM) metrics captured under the namespace
+              `jvm.memory.*`
+
+              Status: **Stable**
+    9af6c99a-2b08-49c7-be02-27ea59ec6413:
+      kind: Panel
+      spec:
+        display:
+          name: Garbage Collection
+        plugin:
+          kind: Markdown
+          spec:
+            text: >+
+              Java Virtual Machine (JVM) metrics captured under the namespace
+              `jvm.gc.*`
+
+              Status: **Stable**
+
+    d3d9e6a8-e835-4def-8aef-f82ac0fb5fae:
+      kind: Panel
+      spec:
+        display:
+          name: Memory Used After Last GC
+          description: >-
+            Measure of memory used, as measured after the most recent garbage
+            collection event on this pool.
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: true
+              display: line
+              lineWidth: 2
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: bytes
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: >-
+                    sum by
+                    (instance)(increase(process_runtime_jvm_memory_usage_after_last_gc_bytes[5m]))
+                  seriesNameFormat: '{{ instance }} '
+    d4391068-2587-4183-9956-45f91735a14d:
+      kind: Panel
+      spec:
+        display:
+          name: Memory Committed
+          description: "Measure of memory committed.\t"
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: true
+              display: line
+              lineWidth: 2
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: bytes
+                shortValues: true
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: >-
+                    sum by
+                    (instance)(increase(process_runtime_jvm_memory_committed_bytes[5m]))
+                  seriesNameFormat: '{{ instance }} '
+    faca90ce-15ed-4e72-8a1d-38ee15b4f84f:
+      kind: Panel
+      spec:
+        display:
+          name: CPU Recent Utilization
+          description: Recent CPU utilization for the process as reported by the JVM.
+        plugin:
+          kind: TimeSeriesChart
+          spec:
+            legend:
+              mode: list
+              position: bottom
+            thresholds: {}
+            visual:
+              areaOpacity: 0
+              connectNulls: false
+              display: line
+              lineWidth: 1
+              palette:
+                mode: auto
+              pointRadius: 2.5
+            yAxis:
+              format:
+                decimalPlaces: 2
+                unit: decimal
+              min: 0
+              show: true
+        queries:
+          - kind: TimeSeriesQuery
+            spec:
+              plugin:
+                kind: PrometheusTimeSeriesQuery
+                spec:
+                  query: >-
+                    sum by (instance)
+                    (process_runtime_jvm_system_cpu_utilization_ratio)
+                  seriesNameFormat: '{{ instance }}'
+  layouts:
+    - kind: Grid
+      spec:
+        items:
+          - x: 14
+            'y': 10
+            width: 10
+            height: 10
+            content:
+              $ref: '#/spec/panels/faca90ce-15ed-4e72-8a1d-38ee15b4f84f'
+          - x: 3
+            'y': 0
+            width: 11
+            height: 5
+            content:
+              $ref: '#/spec/panels/74374d23-3674-45ba-bb8f-29e883021d23'
+          - x: 3
+            'y': 20
+            width: 21
+            height: 6
+            content:
+              $ref: '#/spec/panels/4a651aae-bb3c-41ff-8b38-f2dfa3828810'
+          - x: 3
+            'y': 26
+            width: 21
+            height: 6
+            content:
+              $ref: '#/spec/panels/2feec1a5-ca5b-4a11-829d-b1668c637516'
+          - x: 14
+            'y': 0
+            width: 10
+            height: 5
+            content:
+              $ref: '#/spec/panels/d4391068-2587-4183-9956-45f91735a14d'
+          - x: 3
+            'y': 5
+            width: 11
+            height: 5
+            content:
+              $ref: '#/spec/panels/6f0b5266-a4c4-4cac-af05-b16c5d6fe37d'
+          - x: 14
+            'y': 5
+            width: 10
+            height: 5
+            content:
+              $ref: '#/spec/panels/d3d9e6a8-e835-4def-8aef-f82ac0fb5fae'
+          - x: 0
+            'y': 0
+            width: 3
+            height: 10
+            content:
+              $ref: '#/spec/panels/91f5fb54-d399-42ef-82af-56b4ed8de130'
+          - x: 0
+            'y': 10
+            width: 3
+            height: 10
+            content:
+              $ref: '#/spec/panels/902835ad-86b7-4aaf-b895-771e4cbc9fda'
+          - x: 3
+            'y': 10
+            width: 11
+            height: 10
+            content:
+              $ref: '#/spec/panels/1414a5e9-2288-4d91-832b-6a856a2dd8f6'
+          - x: 0
+            'y': 20
+            width: 3
+            height: 6
+            content:
+              $ref: '#/spec/panels/9af6c99a-2b08-49c7-be02-27ea59ec6413'
+          - x: 0
+            'y': 26
+            width: 3
+            height: 6
+            content:
+              $ref: '#/spec/panels/1782a76b-9d98-4b19-866e-f4b0354e3220'
+  variables: []
+  duration: 30m
+  refreshInterval: 0s
+

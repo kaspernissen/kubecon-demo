@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: todo-go
+  namespace: default
+  labels:
+    app: todo-go
+spec:
+  selector:
+    matchLabels:
+      app: todo-go
+  namespaceSelector:
+    matchNames:
+    - default
+  endpoints:
+  - port: http
+    interval: 15s
