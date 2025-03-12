@@ -436,6 +436,6 @@ spec:
             content:
               $ref: '#/spec/panels/1782a76b-9d98-4b19-866e-f4b0354e3220'
   variables: []
-  duration: 30m
+  duration: 5m
   refreshInterval: 0s
 

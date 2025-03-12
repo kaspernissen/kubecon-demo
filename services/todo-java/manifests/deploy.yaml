@@ -14,7 +14,7 @@ spec:
       labels:
         app: todo-java
       annotations:
-        instrumentation.opentelemetry.io/inject-java: "opentelemetry/instrumentation"
+        #instrumentation.opentelemetry.io/inject-java: "opentelemetry/instrumentation"
     spec:
       containers:
       - image: todo-java:v1

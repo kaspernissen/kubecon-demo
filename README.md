@@ -61,3 +61,8 @@ make deploy-k8s
 make deploy-perses-dashboards
 ```
 
+
+Add the annotation
+```sh
+instrumentation.opentelemetry.io/inject-go: "opentelemetry/instrumentation"
+```

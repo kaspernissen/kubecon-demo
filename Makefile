@@ -13,7 +13,7 @@ kind-load: docker
 	kind load docker-image --name $(CLUSTER_NAME) todo-go:$(VERSION)
 	kind load docker-image --name $(CLUSTER_NAME) todo-java:$(VERSION)
 
-deploy-k8s: 
+deploy-k8s: kind-load 
 	kubectl apply -f ./services/todo-go/manifests/
 	kubectl apply -f ./services/todo-java/manifests/
 

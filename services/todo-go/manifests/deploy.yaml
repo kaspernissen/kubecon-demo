@@ -14,7 +14,7 @@ spec:
       labels:
         app: todo-go
       annotations:
-        instrumentation.opentelemetry.io/inject-go: "opentelemetry/instrumentation"
+        #instrumentation.opentelemetry.io/inject-go: "opentelemetry/instrumentation"
         instrumentation.opentelemetry.io/otel-go-auto-target-exe: '/todo'
     spec:
       containers:
