@@ -55,14 +55,18 @@ make kind-load
 make deploy-k8s
 ```
 
-7. Let's deploy our dashboards
+7. Show-case the annotation in the two `Deployment`'s
+
+Add the annotation
+```sh
+instrumentation.opentelemetry.io/inject-go: "opentelemetry/instrumentation"
+```
+
+
+8. Let's deploy our dashboards
 
 ```sh
 make deploy-perses-dashboards
 ```
 
 
-Add the annotation
-```sh
-instrumentation.opentelemetry.io/inject-go: "opentelemetry/instrumentation"
-```
